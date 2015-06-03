@@ -1,37 +1,42 @@
 # encoding: utf-8
 require "logstash/inputs/base"
 require "logstash/namespace"
-require "stud/interval"
 require "socket" # for Socket.gethostname
+require_relative "typeperf_wrapper"
 
-# Generate a repeating message.
-#
-# This plugin is intented only as an example.
+# Generates logs for Windows Performance Monitor
 class LogStash::Inputs::Perfmon < LogStash::Inputs::Base
   config_name "perfmon"
 
   # If undefined, Logstash will complain, even if codec is unused.
   default :codec, "plain" 
 
-  # The message string to use in the event.
-  config :message, :validate => :string, :default => "Hello World!"
+  # Set how frequently metrics should be gathered
+  config :interval, :validate => :number, :default => 10
 
-  # Set how frequently messages should be sent.
-  #
-  # The default, `1`, means send a message every second.
-  config :interval, :validate => :number, :default => 1
-
+  #------------Public Methods--------------------
   public
+  
   def register
     @host = Socket.gethostname
-  end # def register
+	@typeperf = TypeperfWrapper.new
+  end
 
+  # Runs the perf monitor and monitors its output
   def run(queue)
-    Stud.interval(@interval) do
-      event = LogStash::Event.new("message" => @message, "host" => @host)
+    @typeperf.start_monitor
+	data = $stdout.sysread(16384)
+	@codec.decode(data) do |event|
       decorate(event)
       queue << event
-    end # loop
-  end # def run
+	end
+  end 
 
+  # Cleans up any resources
+  def teardown
+    @logger.debug("Stopping the perfmon monitor")
+    @typeperf.stop_monitor
+	@logger.debug("Perfmon monitor shutdown? #{@typeperf.alive?}")
+	finished
+  end
 end
