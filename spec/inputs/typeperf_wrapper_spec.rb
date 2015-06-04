@@ -25,7 +25,7 @@ describe 'TypeperfWrapper' do
   
   describe 'start_monitor' do
     it 'should raise error if no counters are defined' do
-	  expect { wrapper.start_monitor }.to raise_error('No counters defined')
+	  expect { wrapper.start_monitor }.to raise_error('No perfmon counters defined')
 	end
 	
 	it 'should start the process running' do
