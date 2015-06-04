@@ -1,4 +1,5 @@
 require 'win32/process'
+require_relative 'perfmon_proc_getter'
 
 # Wraps the typeperf command-line tool, used to get 
 # Windows performance metrics
@@ -6,70 +7,55 @@ class TypeperfWrapper
   attr_reader :counters
   
   # Initializes the TypeperfWrapper class
-  def initialize
+  # [perfmon_proc_getter] Gets the proc for opening the perfmon process and getting messages
+  # [interval] The time between samples, defaults to ten seconds
+  def initialize(perfmon_proc_getter, interval = 10)
+    @interval = interval
+	@perfmon_proc_getter = perfmon_proc_getter
     @counters = []
+	@msg_queue = Queue.new
   end
   
   # Adds a counter to the list of counters watched
   # [counter_name] The path to the counter, such as "\\processor(_total)\\% processor time"
   def add_counter(counter_name)
-    @counters << counter_name.downcase!
+    @counters << counter_name.downcase
   end
   
   # Begins monitoring, using the counters in the @counters array
   # [interval] The time between samples, defaults to ten seconds
-  def start_monitor(interval = 10)
-    raise "No perfmon counters defined" if @counters.empty?
-	
-    cmd = get_typeperf_command(@counters, interval)
-	
-    @t1 = Thread.new do
-      IO.popen(cmd) do |f|
-        @pid = f.pid
-
-        f.each do |line| 
-          puts line
-        end
-      end
-    end
-	
-    wait_for_pid_to_be_assigned()
+  def start_monitor
+    raise "No perfmon counters defined" if @counters.compact.empty?
+	open_thread_and_do_work()
   end
   
   # Stops monitoring
   def stop_monitor
-    Process.kill(9, @pid) 
+    @perfmon_proc_getter.stop_process
   end
   
   # Gets a value indicating whether the typeperf process is running
   def alive?
-    return false if @pid.nil?
+    @perfmon_proc_getter.proc_is_running?
+  end
   
-    result = `#{get_tasklist_command(@pid)}`
-
-    return false if result.nil?
-    return false if result =~ /No tasks are running which match the specified criteria/
-    return true
+  # Waits until a new message is put onto the queue, then returns it
+  def get_next
+    while @msg_queue.empty?
+      sleep 0.5 
+	end
+	
+    @msg_queue.pop
   end
   
   #-------------Private methods----------------
   private
   
-  def get_typeperf_command(counters, interval)
-    cmd = "typeperf "
-    counters.each { |counter| cmd << "\"#{counter}\" " }
-    cmd << "-si #{interval.to_s} "
-    return cmd
-  end
-  
-  def get_tasklist_command(pid)
-    "tasklist /FI \"PID eq #{pid}\""
-  end
-  
-  def wait_for_pid_to_be_assigned
-    5.times do
-      break if @pid != nil
-      sleep 1
+  def open_thread_and_do_work
+    @t1 = Thread.new do
+	  @perfmon_proc_getter.start_process(@counters, @interval, @msg_queue)
     end
+	
+	@perfmon_proc_getter.wait_for_process_to_start
   end
 end
