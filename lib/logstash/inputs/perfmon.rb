@@ -12,10 +12,10 @@ require_relative "typeperf_wrapper"
 #     input {
 #       perfmon {
 #         interval => 10
-#	      counters => [
-#		    "\Processor(_Total)\% Privileged Time",
-#            "\Processor(_Total)\% Processor Time", 
-#            "\Processor(_Total)\% User Time"]
+#         counters => [
+#           "\Processor(_Total)\% Privileged Time",
+#           "\Processor(_Total)\% Processor Time", 
+#           "\Processor(_Total)\% User Time"]
 #       }
 #     }
 class LogStash::Inputs::Perfmon < LogStash::Inputs::Base
