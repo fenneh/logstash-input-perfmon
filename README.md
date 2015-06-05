@@ -41,11 +41,32 @@ Create a configuration file. The following collects three metrics every ten seco
             "\Processor(_Total)\% User Time"]
       }
     }
+	
+    filter {
+      grok {
+        match => {
+          "message" => "%{DATESTAMP:Occurred},%{NUMBER:PrivilegedTime},%{NUMBER:ProcessorTime},%{NUMBER:UserTime}"
+        }
+      }
+    }
 
     output {
       file {
         path => "C:\perfmon_output.txt"
       }
+    }
+```
+
+This configuration will produce output like:
+```
+    {
+	  "message":"06/05/2015 15:40:46.999,0.781236,7.032877,6.249891",
+      "@version":"1",
+      "@timestamp":"2015-06-05T19:40:48.468Z",
+      "Occurred":"06/05/2015 15:40:46.999",
+      "PrivilegedTime":"0.781236",
+      "ProcessorTime":"7.032877",
+      "UserTime":"6.249891"
     }
 ```
 
