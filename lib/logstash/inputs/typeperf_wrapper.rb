@@ -11,9 +11,9 @@ class TypeperfWrapper
   # [interval] The time between samples, defaults to ten seconds
   def initialize(perfmon_proc_getter, interval = 10)
     @interval = interval
-	@perfmon_proc_getter = perfmon_proc_getter
+    @perfmon_proc_getter = perfmon_proc_getter
     @counters = []
-	@msg_queue = Queue.new
+    @msg_queue = Queue.new
   end
   
   # Adds a counter to the list of counters watched
@@ -27,7 +27,7 @@ class TypeperfWrapper
   # [interval] The time between samples, defaults to ten seconds
   def start_monitor
     raise "No perfmon counters defined" if @counters.compact.empty?
-	open_thread_and_do_work()
+    open_thread_and_do_work()
   end
   
   # Stops monitoring
@@ -44,7 +44,7 @@ class TypeperfWrapper
   def get_next
     while @msg_queue.empty?
       sleep 0.5 
-	end
+    end
 	
     @msg_queue.pop
   end
@@ -57,6 +57,6 @@ class TypeperfWrapper
 	  @perfmon_proc_getter.start_process(@counters, @interval, @msg_queue)
     end
 	
-	@perfmon_proc_getter.wait_for_process_to_start
+    @perfmon_proc_getter.wait_for_process_to_start
   end
 end

@@ -4,7 +4,20 @@ require "logstash/namespace"
 require "socket" # for Socket.gethostname
 require_relative "typeperf_wrapper"
 
-# Generates logs for Windows Performance Monitor
+# This input will pull metrics from https://technet.microsoft.com/en-us/library/cc749249.aspx[Windows Performance Monitor].
+# Under the covers, it uses https://technet.microsoft.com/en-us/library/bb490960.aspx[Typeperf].
+#
+# To collect performance measurements, use a config like:
+# [source,ruby]
+#     input {
+#       perfmon {
+#         interval => 10
+#	      counters => [
+#		    "\Processor(_Total)\% Privileged Time",
+#            "\Processor(_Total)\% Processor Time", 
+#            "\Processor(_Total)\% User Time"]
+#       }
+#     }
 class LogStash::Inputs::Perfmon < LogStash::Inputs::Base
   attr_reader :counters, :interval
   
@@ -25,34 +38,35 @@ class LogStash::Inputs::Perfmon < LogStash::Inputs::Base
   #------------Public Methods--------------------
   public
   
+  # Registers the plugin with logstash
   def register
-	@host = Socket.gethostname
-	@typeperf = TypeperfWrapper.new(PerfmonProcGetter.new, @interval)
-	@counters.each { |counter| @typeperf.add_counter(counter) }
+    @host = Socket.gethostname
+    @typeperf = TypeperfWrapper.new(PerfmonProcGetter.new, @interval)
+    @counters.each { |counter| @typeperf.add_counter(counter) }
   end
 
   # Runs the perf monitor and monitors its output
   def run(queue)
     @typeperf.start_monitor
 	
-	@logger.debug("Started perfmon monitor")
+    @logger.debug("Started perfmon monitor")
 
-	while @typeperf.alive?
-	  data = @typeperf.get_next
+    while @typeperf.alive?
+      data = @typeperf.get_next
 
-	  @codec.decode(data) do |event|
+      @codec.decode(data) do |event|
         decorate(event)
         queue << event
-		@logger.debug("Added event to queue: #{event}")
-	  end
-	end
+        @logger.debug("Added event to queue: #{event}")
+      end
+    end
   end 
 
   # Cleans up any resources
   def teardown
     @typeperf.stop_monitor
-	@logger.debug("Stopped the perfmon monitor")
-	finished
+    @logger.debug("Stopped the perfmon monitor")
+    finished
   end
 
 end
