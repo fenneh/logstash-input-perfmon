@@ -21,5 +21,12 @@ describe 'UnitTests' do
 	  end
 	end
 	
+	describe 'get_all_counters_command' do
+	  it 'should be expected command' do
+	    result = getter.get_all_counters_command
+		expect(result).to eq 'typeperf -q'
+	  end
+	end
+	
   end
 end

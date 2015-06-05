@@ -7,13 +7,13 @@ describe 'IntegrationTests' do
     subject(:plugin) do
 	  LogStash::Inputs::Perfmon.new(
 		  "interval" => 1,
-		  "counters" => ["\\processor(_total)\\% processor time"]
+		  "counters" => ["\\Processor(_Total)\\% Processor Time"]
 		)
 	end
   
     describe 'initialize' do
       it 'assigns counters and interval' do
-		expect(plugin.counters).to eq ["\\processor(_total)\\% processor time"]
+		expect(plugin.counters).to eq ["\\Processor(_Total)\\% Processor Time"]
 		expect(plugin.interval).to eq 1
 	  end
     end

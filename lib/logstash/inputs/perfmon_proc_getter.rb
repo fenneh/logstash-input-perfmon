@@ -1,6 +1,10 @@
 class PerfmonProcGetter
   attr_reader :pid
   
+  def initialize
+    @all_counters = `#{get_all_counters_command}`
+  end
+  
   def start_process(counters, interval, output_queue)
 	cmd = get_typeperf_command(counters, interval)
 	  
@@ -8,6 +12,7 @@ class PerfmonProcGetter
       @pid = f.pid
 
       f.each do |line| 
+		next if counters.any? { |counter| line.include? counter } # don't show lines that contain headers
         output_queue << line
       end
     end
@@ -15,16 +20,20 @@ class PerfmonProcGetter
   
   def stop_process
     Process.kill(9, @pid) 
+	@pid = nil
   end
   
   def proc_is_running?
-    return false if @pid.nil?
+    if @pid.nil?
+	  return false
+	else
+	  return true
+	end
+  end
   
-    result = `#{get_tasklist_command(@pid)}`
-
-    return false if result.nil?
-    return false if result =~ /No tasks are running which match the specified criteria/
-    return true
+  def counter_exists?(counter_name)
+    counter_name = counter_name.gsub(/\(.+\)/, '(*)')
+	return @all_counters.include?(counter_name)
   end
   
   def get_typeperf_command(counters, interval)
@@ -36,6 +45,10 @@ class PerfmonProcGetter
   
   def get_tasklist_command(pid)
     "tasklist /FI \"PID eq #{pid}\""
+  end
+  
+  def get_all_counters_command
+    "typeperf -q"
   end
   
   def wait_for_process_to_start

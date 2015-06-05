@@ -12,6 +12,10 @@ class MockPerfmonProcGetter
   def wait_for_process_to_start
     sleep 1
   end
+  
+  def counter_exists?(counter_name)
+    true
+  end
 end
 
 describe 'UnitTests' do
@@ -114,5 +118,11 @@ describe 'IntegrationTests' do
 	    expect(wrapper.alive?).to eq false
 	  end
     end
+	
+	describe 'add_counter' do
+	  it 'raises error when counter is not found' do
+	    expect { wrapper.add_counter('\\Nada(_total)\\% DoesntExist') }.to raise_error 'Perfmon counter could not be found.'
+	  end
+	end
   end
 end

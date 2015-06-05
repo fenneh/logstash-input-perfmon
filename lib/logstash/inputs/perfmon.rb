@@ -13,17 +13,20 @@ class LogStash::Inputs::Perfmon < LogStash::Inputs::Base
   # If undefined, Logstash will complain, even if codec is unused.
   default :codec, "plain" 
   
-  # Sets which perf counters to monitor
-  config :counters, :validate => :array, :required => true
+  # Sets which perfmon counters to collect
+  config :counters, :validate => :array, :required => false, :default => [
+    "\\Processor(_Total)\\% Processor Time",
+    "\\Processor Information(_Total)\\% User Time", 
+    "\\Process(_Total)\\% Privileged Time"]
 
-  # Sets how frequently metrics should be gathered
-  config :interval, :validate => :number, :default => 10, :required => false
+  # Sets the frequency, in seconds, at which to collect perfmon metrics
+  config :interval, :validate => :number, :required => false, :default => 10
   
   #------------Public Methods--------------------
   public
   
   def register
-    @host = Socket.gethostname
+	@host = Socket.gethostname
 	@typeperf = TypeperfWrapper.new(PerfmonProcGetter.new, @interval)
 	@counters.each { |counter| @typeperf.add_counter(counter) }
   end
@@ -33,11 +36,10 @@ class LogStash::Inputs::Perfmon < LogStash::Inputs::Base
     @typeperf.start_monitor
 	
 	@logger.debug("Started perfmon monitor")
-	
+
 	while @typeperf.alive?
 	  data = @typeperf.get_next
-	  @logger.debug("Got perfmon data: #{data}")
-	
+
 	  @codec.decode(data) do |event|
         decorate(event)
         queue << event
