@@ -9,17 +9,25 @@ It is fully free and fully open source. The license is Apache 2.0, meaning you a
 On Windows, performance metrics can be collected using [Windows Performance Monitor](https://technet.microsoft.com/en-us/library/cc749249.aspx).
 This plugin collects the same sort of counters by using the command-line tool [Typeperf](https://technet.microsoft.com/en-us/library/bb490960.aspx).
 
+To run the tests (be sure that JRuby is installed prior):
+```
+    git clone https://github.com/NickMRamirez/logstash-input-perfmon.git
+    cd logstash-input-perfmon
+    jruby -S bundle install
+    jruby -S bundle exec rspec spec
+```
+
 To build the gem:
 ```
     git clone https://github.com/NickMRamirez/logstash-input-perfmon.git
 	cd logstash-input-perfmon
     gem build logstash-input-perfmon.gemspec
 ```
-	
+
 To install the gem to logstash:
 ```
-    cd path\to\logstash
-    bin/plugin install path\to\gem
+    cd path\to\logstash\bin
+    plugin install path\to\gem
 ```
 	
 Create a configuration file. The following collects three metrics every ten seconds:
@@ -39,4 +47,9 @@ Create a configuration file. The following collects three metrics every ten seco
         path => "C:\perfmon_output.txt"
       }
     }
+```
+
+Run logstash:
+```
+    logstash -f C:\path\to\conf
 ```
