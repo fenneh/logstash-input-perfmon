@@ -7,13 +7,6 @@ describe 'UnitTests' do
     
 	subject(:getter) { PerfmonProcGetter.new }
 	
-	describe 'get_tasklist_command' do
-	  it 'should be expected command' do
-	    result = getter.get_tasklist_command(1234)
-		expect(result).to eq 'tasklist /FI "PID eq 1234"'
-	  end
-	end
-	
 	describe 'get_typeperf_command' do
 	  it 'should be expected command' do
 	    result = getter.get_typeperf_command(["test_counter", "test_counter_2"], 1)

@@ -18,6 +18,7 @@ class PerfmonProcGetter
 
       f.each do |line| 
         next if counters.any? { |counter| line.include? counter } # don't show lines that contain headers
+		line.gsub!('"', '') # remove quotes
         output_queue << line
       end
     end
@@ -44,7 +45,7 @@ class PerfmonProcGetter
   # [counter_name] The name of the counter, such as "\\Processor(_Total)\\% Processor Time"
   def counter_exists?(counter_name)
     counter_name = counter_name.gsub(/\(.+\)/, '(*)')
-    return @all_counters.include?(counter_name)
+    return @all_counters.downcase.include?(counter_name.downcase)
   end
   
   # Gets the typeperf command line
