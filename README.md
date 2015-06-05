@@ -10,15 +10,20 @@ On Windows, performance metrics can be collected using [Windows Performance Moni
 This plugin collects the same sort of counters by using the command-line tool [Typeperf](https://technet.microsoft.com/en-us/library/bb490960.aspx).
 
 To build the gem:
+```
     git clone https://github.com/NickMRamirez/logstash-input-perfmon.git
 	cd logstash-input-perfmon
     gem build logstash-input-perfmon.gemspec
+```
 	
 To install the gem to logstash:
+```
     cd path\to\logstash
     bin/plugin install path\to\gem
+```
 	
 Create a configuration file. The following collects three metrics every ten seconds:
+```ruby
     input {
       perfmon {
         interval => 10 
@@ -34,3 +39,4 @@ Create a configuration file. The following collects three metrics every ten seco
         path => "C:\perfmon_output.txt"
       }
     }
+```
