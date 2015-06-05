@@ -29,6 +29,8 @@ class PerfmonProcGetter
     @pid = nil
   end
   
+  # Gets a value indicating whether the typeperf
+  # process is currently running
   def proc_is_running?
     if @pid.nil?
       return false
