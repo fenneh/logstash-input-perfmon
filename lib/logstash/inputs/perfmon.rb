@@ -18,6 +18,14 @@ require_relative "typeperf_wrapper"
 #           "\Processor(_Total)\% User Time"]
 #       }
 #     }
+
+#     filter {
+#       grok {
+#         match => {
+#           "message" => "%{DATESTAMP:Occurred},%{NUMBER:PrivilegedTime:float},%{NUMBER:ProcessorTime:float},%{NUMBER:UserTime:float}"
+#       }
+#     }
+#   }
 class LogStash::Inputs::Perfmon < LogStash::Inputs::Base
   attr_reader :counters, :interval
   
