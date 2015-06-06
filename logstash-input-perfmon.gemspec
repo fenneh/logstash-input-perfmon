@@ -3,10 +3,10 @@ Gem::Specification.new do |s|
   s.version = '0.1.0'
   s.licenses = ['Apache License (2.0)']
   s.summary = "Logstash input for Windows Performance Monitor"
-  s.description = "This gem is a logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/plugin install gemname. This gem is not a stand-alone program"
+  s.description = "This gem is a logstash plugin required to be installed on top of the Logstash core pipeline using $LS_HOME/bin/plugin install gemname. This gem is not a stand-alone program. Logstash input for Windows Performance Monitor metrics."
   s.authors = ["Nick Ramirez"]
   s.email = 'nickram44@hotmail.com'
-  s.homepage = "http://www.elastic.co/guide/en/logstash/current/index.html"
+  s.homepage = "https://github.com/NickMRamirez/logstash-input-perfmon"
   s.require_paths = ["lib"]
 
   # Files
