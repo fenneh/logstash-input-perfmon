@@ -58,7 +58,7 @@ output {
 ```
 
 This configuration will produce output like:
-```
+```json
 {
   "message":"06/05/2015 15:40:46.999,0.781236,7.032877,6.249891",
   "@version":"1",
