@@ -7,14 +7,41 @@ describe 'IntegrationTests' do
     subject(:plugin) do
 	  LogStash::Inputs::Perfmon.new(
 		  "interval" => 1,
-		  "counters" => ["\\processor(_total)\\% processor time"]
+		  "counters" => ["\\processor(_total)\\% processor time"],
+		  "host" => "webserver1"
 		)
 	end
   
     describe 'initialize' do
-      it 'assigns counters and interval' do
+      it 'assigns counters' do
 		expect(plugin.counters).to eq ["\\processor(_total)\\% processor time"]
-		expect(plugin.interval).to eq 1
+	  end
+	  
+	  it 'assigns interval' do
+        expect(plugin.interval).to eq 1
+	  end
+	  
+	  it 'assigns hostname to host when host is not set' do
+	    my_plugin = LogStash::Inputs::Perfmon.new(
+		  "interval" => 1,
+		  "counters" => ["\\processor(_total)\\% processor time"]
+		)
+		
+		my_plugin.register
+		
+		expect(my_plugin.host).to eq Socket.gethostname
+	  end
+	  
+	  it 'overrides hostname as host when host is set' do
+	    my_plugin = LogStash::Inputs::Perfmon.new(
+		  "interval" => 1,
+		  "counters" => ["\\processor(_total)\\% processor time"],
+		  "host" => "webserver1"
+		)
+		
+		my_plugin.register
+		
+		expect(my_plugin.host).to eq 'webserver1'
 	  end
     end
 	

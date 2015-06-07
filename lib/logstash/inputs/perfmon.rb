@@ -27,7 +27,7 @@ require_relative "typeperf_wrapper"
 #     }
 #   }
 class LogStash::Inputs::Perfmon < LogStash::Inputs::Base
-  attr_reader :counters, :interval
+  attr_reader :counters, :interval, :host
   
   config_name "perfmon"
 
@@ -43,17 +43,28 @@ class LogStash::Inputs::Perfmon < LogStash::Inputs::Base
   # Sets the frequency, in seconds, at which to collect perfmon metrics
   config :interval, :validate => :number, :required => false, :default => 10
   
+  # Identifies the server being monitored. Defaults to hostname, but can be overriden.
+  # [source,ruby]
+  #     input {
+  #       perfmon {
+  #         interval => 10
+  #         counters => ["\Processor(_Total)\% Privileged Time"],
+  #         host => "webserver1"
+  #       }
+  #     }
+  config :host, :required => false, :default => Socket.gethostname
+  
   #------------Public Methods--------------------
   public
   
   # Registers the plugin with logstash
   def register
-    @host = Socket.gethostname
     @typeperf = TypeperfWrapper.new(PerfmonProcGetter.new, @interval)
     @counters.each { |counter| @typeperf.add_counter(counter) }
   end
 
   # Runs the perf monitor and monitors its output
+  # [queue] The queue to add new events to
   def run(queue)
     @typeperf.start_monitor
 	
@@ -64,6 +75,9 @@ class LogStash::Inputs::Perfmon < LogStash::Inputs::Base
 
       @codec.decode(data) do |event|
         decorate(event)
+		
+		event['host'] = @host
+		
         queue << event
         @logger.debug("Added event to queue: #{event}")
       end

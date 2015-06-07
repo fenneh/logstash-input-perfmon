@@ -13,14 +13,13 @@ To run the tests (be sure that JRuby is installed prior):
 ```
 git clone https://github.com/NickMRamirez/logstash-input-perfmon.git
 cd logstash-input-perfmon
+jruby -S gem install bundler
 jruby -S bundle install
 jruby -S bundle exec rspec spec
 ```
 
 To build the gem:
 ```
-git clone https://github.com/NickMRamirez/logstash-input-perfmon.git
-cd logstash-input-perfmon
 gem build logstash-input-perfmon.gemspec
 ```
 
@@ -72,5 +71,17 @@ This configuration will produce output like:
 
 Run logstash:
 ```
-    logstash -f C:\path\to\conf
+logstash -f C:\path\to\conf
 ```
+
+## Troubleshooting
+
+If you get bundler errors having to do with not being able to install a gem, such as:
+```
+You have requested:
+  logstash-devutil >= 0
+  
+The bundle currently has logstash-devutil locked at 0.0.13.
+Try running 'bundle update logstash-devutils'
+```
+The JRuby -S parameter looks at your PATH and it may be defaulting to another version of Ruby. 
