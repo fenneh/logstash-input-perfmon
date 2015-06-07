@@ -62,6 +62,7 @@ This configuration will produce output like:
   "message":"06/05/2015 15:40:46.999,0.781236,7.032877,6.249891",
   "@version":"1",
   "@timestamp":"2015-06-05T19:40:48.468Z",
+  "host":"Webserver1",
   "Occurred":"06/05/2015 15:40:46.999",
   "PrivilegedTime":0.781236,
   "ProcessorTime":7.032877,
