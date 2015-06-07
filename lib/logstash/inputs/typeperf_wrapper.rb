@@ -53,8 +53,8 @@ class TypeperfWrapper
   private
   
   def open_thread_and_do_work
-    @t1 = Thread.new do
-	  @perfmon_proc_getter.start_process(@counters, @interval, @msg_queue)
+    Thread.new do
+      @perfmon_proc_getter.start_process(@counters, @interval, @msg_queue)
     end
 	
     @perfmon_proc_getter.wait_for_process_to_start

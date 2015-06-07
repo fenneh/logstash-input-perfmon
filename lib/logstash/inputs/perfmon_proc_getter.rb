@@ -18,8 +18,8 @@ class PerfmonProcGetter
 
       f.each do |line| 
         next if counters.any? { |counter| line.include? counter } # don't show lines that contain headers
-		line.gsub!('"', '') # remove quotes
-		line.strip!
+        line.gsub!('"', '') # remove quotes
+        line.strip!
         output_queue << line
       end
     end
