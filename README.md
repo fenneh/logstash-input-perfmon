@@ -55,6 +55,10 @@ output {
   }
 }
 ```
+Run logstash:
+```
+logstash -f C:\path\to\conf
+```
 
 This configuration will produce output like:
 ```json
@@ -68,11 +72,6 @@ This configuration will produce output like:
   "ProcessorTime":7.032877,
   "UserTime":6.249891
 }
-```
-
-Run logstash:
-```
-logstash -f C:\path\to\conf
 ```
 
 ## Troubleshooting
